@@ -54,7 +54,7 @@ test('supported literal and regex occurrences agree with pinned ripgrep', async 
     { text: '', pattern: '^', kind: 'regex' },
   ];
   const version = execFileSync('rg', ['--version'], { encoding: 'utf8' });
-  assert.match(version, /^ripgrep 15\.2\.0 /);
+  assert.match(version, /^ripgrep 15\.2\.0(?:\s|$)/);
   for (const c of cases) {
     await writeFile(join(root, 'a.txt'), c.text);
     const args = ['--no-config', '--engine=default', '--json', ...(c.kind === 'literal' ? ['--fixed-strings'] : []), ...(c.caseSensitive === false ? ['--ignore-case'] : ['--case-sensitive']), '-e', c.pattern, '-'];
