@@ -1,9 +1,11 @@
 #![cfg(target_os = "linux")]
 
+mod scope;
 use grep_matcher::Matcher;
 use grep_regex::{RegexMatcher, RegexMatcherBuilder};
 use rustix::fd::{AsRawFd, OwnedFd};
 use rustix::fs::{self, Dir, FileType, Mode, OFlags, ResolveFlags, Stat};
+use scope::{Scope, ScopeInput};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::fs::File;
@@ -26,6 +28,9 @@ enum Code {
     ByteLimit,
     EntryLimit,
     DepthLimit,
+    PolicyChanged,
+    OutOfScope,
+    RevisionMismatch,
 }
 
 #[derive(Deserialize)]
@@ -42,6 +47,12 @@ struct Request {
     deadline_ms: u64,
     max_entries: usize,
     max_depth: usize,
+    #[serde(default)]
+    scope: ScopeInput,
+    #[serde(default)]
+    validate_scope_only: bool,
+    #[serde(default)]
+    read: Option<ReadRequest>,
 }
 #[derive(Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -50,7 +61,15 @@ enum QueryKind {
     Regex,
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ReadRequest {
+    path: String,
+    range: Range,
+    expected_file_sha256: Option<String>,
+}
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Range {
     start: usize,
     end: usize,
@@ -89,6 +108,7 @@ struct Success {
     matches: Vec<Hit>,
     counts: Counts,
     elapsed_ms: f64,
+    policy_snapshot_hash: String,
     matcher_version: &'static str,
 }
 #[derive(Serialize)]
@@ -239,6 +259,17 @@ fn validate(r: &Request) -> Result<(), Code> {
     {
         return Err(Code::InvalidRequest);
     }
+    if let Some(read) = &r.read {
+        if !valid_path(&read.path)
+            || read.range.start > read.range.end
+            || read.range.end > r.max_file_bytes
+        {
+            return Err(Code::InvalidRequest);
+        }
+        if read.range.end - read.range.start > 4096 {
+            return Err(Code::ByteLimit);
+        }
+    }
     // Prototype rejects whole-buffer anchors/inline flag changes whose rg printer
     // occurrence semantics need a separate compatibility implementation.
     if r.kind == QueryKind::Regex
@@ -258,6 +289,7 @@ struct Search<'a> {
     deadline: Instant,
     result: Success,
     used_bytes: usize,
+    scope: Scope,
 }
 impl Search<'_> {
     fn issue(&mut self, code: Code) {
@@ -272,6 +304,7 @@ impl Search<'_> {
             self.issue(Code::DepthLimit);
             return Ok(());
         }
+        self.scope.enter(self.root, prefix, self.deadline)?;
         let mut dir = Dir::new(reopen(fd, true)?).map_err(|_| Code::ReadFailed)?;
         for entry in &mut dir {
             expired(self.deadline)?;
@@ -293,8 +326,14 @@ impl Search<'_> {
             } else {
                 format!("{prefix}/{name}")
             };
-            if name.starts_with('.') || !valid_path(&path) {
+            if !valid_path(&path) || self.scope.excluded_path(&path) {
                 self.result.counts.excluded += 1;
+                continue;
+            }
+            if let Some(read) = &self.request.read
+                && path != read.path
+                && !read.path.starts_with(&format!("{path}/"))
+            {
                 continue;
             }
             let node = match anchor(self.root, &path) {
@@ -313,6 +352,11 @@ impl Search<'_> {
                     continue;
                 }
             };
+            let is_dir = FileType::from_raw_mode(metadata.st_mode) == FileType::Directory;
+            if !self.scope.allows(&path, is_dir) {
+                self.result.counts.excluded += 1;
+                continue;
+            }
             match FileType::from_raw_mode(metadata.st_mode) {
                 FileType::Directory => match self.walk(&node, &path, depth + 1) {
                     Err(Code::ReadFailed) => {
@@ -328,6 +372,9 @@ impl Search<'_> {
         Ok(())
     }
     fn search_file(&mut self, fd: &OwnedFd, path: &str) -> Result<(), Code> {
+        if self.request.read.as_ref().is_some_and(|r| r.path != path) {
+            return Ok(());
+        }
         let first = capture(fd, self.request.max_file_bytes, self.deadline, || {});
         // Retry by resolving the path again; never call a later revision the old one.
         let read = if matches!(first, Err(Code::SourceMutated)) {
@@ -358,6 +405,37 @@ impl Search<'_> {
         for byte in Sha256::digest(&bytes) {
             digest.push(HEX[usize::from(byte >> 4)] as char);
             digest.push(HEX[usize::from(byte & 15)] as char);
+        }
+        if let Some(read) = &self.request.read {
+            if read
+                .expected_file_sha256
+                .as_ref()
+                .is_some_and(|expected| expected != &digest)
+            {
+                return Err(Code::RevisionMismatch);
+            }
+            let text = std::str::from_utf8(&bytes).map_err(|_| Code::MatchEncoding)?;
+            let (start, end) = (read.range.start, read.range.end);
+            if end > bytes.len() || !text.is_char_boundary(start) || !text.is_char_boundary(end) {
+                return Err(Code::InvalidRequest);
+            }
+            let hit = Hit {
+                path: path.to_owned(),
+                file_sha256: digest,
+                range: Range { start, end },
+                excerpt: Excerpt {
+                    range: Range { start, end },
+                    text: text[start..end].to_owned(),
+                    truncated: false,
+                },
+            };
+            if self.used_bytes + serde_json::to_vec(&hit).map_or(FRAME_CAP, |b| b.len() + 1)
+                > self.request.response_bytes
+            {
+                return Err(Code::ByteLimit);
+            }
+            self.result.matches.push(hit);
+            return Ok(());
         }
         if bytes.is_empty() {
             return Ok(());
@@ -436,6 +514,7 @@ fn search(root: &OwnedFd, r: &Request) -> Result<Success, Code> {
         matcher,
         deadline,
         used_bytes: 2048,
+        scope: Scope::new(&r.scope)?,
         result: Success {
             v: 1,
             id: r.id.clone(),
@@ -445,17 +524,38 @@ fn search(root: &OwnedFd, r: &Request) -> Result<Success, Code> {
             matches: vec![],
             counts: Counts::default(),
             elapsed_ms: 0.0,
+            policy_snapshot_hash: String::new(),
             matcher_version: MATCHER,
         },
     };
-    if let Err(code) = state.walk(root, "", 0) {
-        if matches!(code, Code::RegexInvalid | Code::MatchEncoding)
+    if let Err(code) = if r.validate_scope_only {
+        Ok(())
+    } else {
+        state.walk(root, "", 0)
+    } {
+        if r.read.is_some()
+            || matches!(code, Code::RegexInvalid | Code::MatchEncoding)
             || (code == Code::Deadline && state.result.matches.is_empty())
         {
             return Err(code);
         }
+        if matches!(code, Code::ReadFailed | Code::SourceMutated) {
+            state.result.counts.failed += 1;
+        }
         state.issue(code);
     }
+    if let Err(code) = state.scope.verify(root, deadline) {
+        state.issue(code);
+    }
+    if r.read.is_some() {
+        if let Some(code) = state.result.reasons.first() {
+            return Err(*code);
+        }
+        if state.result.matches.is_empty() {
+            return Err(Code::OutOfScope);
+        }
+    }
+    state.result.policy_snapshot_hash = state.scope.snapshot_hash();
     state.result.elapsed_ms = begin.elapsed().as_secs_f64() * 1000.0;
     Ok(state.result)
 }
