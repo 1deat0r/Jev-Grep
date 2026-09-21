@@ -1,0 +1,20 @@
+[package]
+name = "jev-worker-prototype"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+grep-matcher = "=0.1.9"
+grep-regex = "=0.1.14"
+rustix = { version = "=1.1.5", features = ["fs"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+sha2 = "=0.11.0"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+
+[lints.rust]
+unsafe_code = "forbid"

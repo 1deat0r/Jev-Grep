@@ -3,19 +3,30 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": "26.8.1", "npm": "11.19.0" },
+  "engines": {
+    "node": "26.8.1",
+    "npm": "11.19.0"
+  },
   "packageManager": "npm@11.19.0",
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && node --test dist/tests/**/*.test.js",
+    "test": "npm run native:build && npm run build && node --test dist/tests/**/*.test.js",
     "test:conformance": "npm run build && node --test dist/tests/conformance/*.test.js",
     "contracts:generate": "npm run build && node dist/scripts/contracts.js --write",
     "contracts:check": "npm run build && node dist/scripts/contracts.js --check",
     "spike:confinement": "python3 spikes/confinement.py",
     "spike:matcher": "npm run build && node dist/spikes/matcher.js",
-    "check": "npm run typecheck && npm test && npm run contracts:check"
+    "check": "npm run typecheck && npm run native:test && npm test && npm run contracts:check",
+    "native:build": "cargo build --release --locked --manifest-path native/worker/Cargo.toml",
+    "native:test": "cargo test --locked --manifest-path native/worker/Cargo.toml",
+    "spike:worker": "npm run native:build && npm run build && node dist/spikes/persistent-worker.js"
   },
-  "dependencies": { "zod": "4.6.5" },
-  "devDependencies": { "@types/node": "26.6.2", "typescript": "7.0.2" }
+  "dependencies": {
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.2",
+    "typescript": "7.0.2"
+  }
 }
