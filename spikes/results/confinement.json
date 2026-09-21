@@ -5,7 +5,7 @@
   "tests": 10,
   "failures": 0,
   "errors": 0,
-  "elapsedMs": 10.279,
+  "elapsedMs": 9.894,
   "limitations": [
     "Python prototype; production helper unimplemented",
     "Cannot bound kernel I/O stalls with userspace deadline checks alone",
