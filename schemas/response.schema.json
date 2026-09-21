@@ -1,0 +1,880 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "number",
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "status": {
+          "type": "string",
+          "const": "error"
+        },
+        "error": {
+          "$ref": "#/$defs/__schema1"
+        }
+      },
+      "required": [
+        "version",
+        "requestId",
+        "status",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "number",
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "status": {
+          "type": "string",
+          "const": "ok"
+        },
+        "scope": {
+          "type": "object",
+          "properties": {
+            "workspaceId": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "policyId": {
+              "$ref": "#/$defs/__schema0"
+            },
+            "policyHash": {
+              "$ref": "#/$defs/__schema3"
+            },
+            "include": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "exclude": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "respectIgnore": {
+              "type": "boolean"
+            },
+            "hidden": {
+              "type": "boolean"
+            },
+            "symlinks": {
+              "type": "string",
+              "const": "reject"
+            },
+            "encoding": {
+              "type": "string",
+              "const": "utf-8"
+            },
+            "maxFileBytes": {
+              "maximum": 16777216,
+              "$ref": "#/$defs/__schema6"
+            },
+            "counts": {
+              "type": "object",
+              "properties": {
+                "searched": {
+                  "$ref": "#/$defs/__schema7"
+                },
+                "indexed": {
+                  "$ref": "#/$defs/__schema7"
+                },
+                "excluded": {
+                  "$ref": "#/$defs/__schema7"
+                },
+                "unsupported": {
+                  "$ref": "#/$defs/__schema7"
+                },
+                "oversized": {
+                  "$ref": "#/$defs/__schema7"
+                },
+                "failed": {
+                  "$ref": "#/$defs/__schema7"
+                }
+              },
+              "required": [
+                "searched",
+                "indexed",
+                "excluded",
+                "unsupported",
+                "oversized",
+                "failed"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "workspaceId",
+            "policyId",
+            "policyHash",
+            "include",
+            "exclude",
+            "respectIgnore",
+            "hidden",
+            "symlinks",
+            "encoding",
+            "maxFileBytes",
+            "counts"
+          ],
+          "additionalProperties": false
+        },
+        "issues": {
+          "maxItems": 128,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "operation": {
+                  "type": "string",
+                  "const": "exact"
+                },
+                "source": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "live-read"
+                    },
+                    "startedAt": {
+                      "$ref": "#/$defs/__schema9"
+                    },
+                    "endedAt": {
+                      "$ref": "#/$defs/__schema9"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "startedAt",
+                    "endedAt"
+                  ],
+                  "additionalProperties": false
+                },
+                "coverage": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "const": "complete"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "const": "partial"
+                        },
+                        "reasons": {
+                          "minItems": 1,
+                          "maxItems": 6,
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/$defs/__schema10"
+                          }
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "reasons"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "matches": {
+                  "maxItems": 1000,
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema11"
+                  }
+                }
+              },
+              "required": [
+                "operation",
+                "source",
+                "coverage",
+                "matches"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "operation": {
+                  "type": "string",
+                  "const": "discover"
+                },
+                "source": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "index"
+                    },
+                    "generationId": {
+                      "$ref": "#/$defs/__schema0"
+                    },
+                    "manifestHash": {
+                      "$ref": "#/$defs/__schema3"
+                    },
+                    "publishedAt": {
+                      "$ref": "#/$defs/__schema9"
+                    },
+                    "scanStartedAt": {
+                      "$ref": "#/$defs/__schema9"
+                    },
+                    "scanEndedAt": {
+                      "$ref": "#/$defs/__schema9"
+                    },
+                    "coverage": {
+                      "type": "string",
+                      "enum": [
+                        "eligible-scan-complete",
+                        "eligible-scan-incomplete"
+                      ]
+                    },
+                    "failedFiles": {
+                      "$ref": "#/$defs/__schema8"
+                    },
+                    "observedAt": {
+                      "$ref": "#/$defs/__schema9"
+                    },
+                    "generationAgeMs": {
+                      "$ref": "#/$defs/__schema8"
+                    },
+                    "clockSkew": {
+                      "type": "boolean"
+                    },
+                    "lastUpdateOutcome": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "never-attempted"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "succeeded"
+                            },
+                            "attemptId": {
+                              "$ref": "#/$defs/__schema0"
+                            },
+                            "completedAt": {
+                              "$ref": "#/$defs/__schema9"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "attemptId",
+                            "completedAt"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "failed"
+                            },
+                            "attemptId": {
+                              "$ref": "#/$defs/__schema0"
+                            },
+                            "completedAt": {
+                              "$ref": "#/$defs/__schema9"
+                            },
+                            "issue": {
+                              "$ref": "#/$defs/__schema1"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "attemptId",
+                            "completedAt",
+                            "issue"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "generationId",
+                    "manifestHash",
+                    "publishedAt",
+                    "scanStartedAt",
+                    "scanEndedAt",
+                    "coverage",
+                    "failedFiles",
+                    "observedAt",
+                    "generationAgeMs",
+                    "clockSkew",
+                    "lastUpdateOutcome"
+                  ],
+                  "additionalProperties": false
+                },
+                "selection": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "ranked"
+                    },
+                    "requestedLimit": {
+                      "maximum": 1000,
+                      "$ref": "#/$defs/__schema6"
+                    },
+                    "limitReached": {
+                      "type": "boolean"
+                    },
+                    "degraded": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "requestedLimit",
+                    "limitReached",
+                    "degraded"
+                  ],
+                  "additionalProperties": false
+                },
+                "execution": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "const": "complete"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "const": "partial"
+                        },
+                        "reasons": {
+                          "minItems": 1,
+                          "maxItems": 3,
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/$defs/__schema14"
+                          }
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "reasons"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "hits": {
+                  "maxItems": 1000,
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema15"
+                  }
+                }
+              },
+              "required": [
+                "operation",
+                "source",
+                "selection",
+                "execution",
+                "hits"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "operation": {
+                  "type": "string",
+                  "enum": [
+                    "read-verified",
+                    "read-fresh"
+                  ]
+                },
+                "evidence": {
+                  "$ref": "#/$defs/__schema12"
+                },
+                "capturedAt": {
+                  "$ref": "#/$defs/__schema9"
+                }
+              },
+              "required": [
+                "operation",
+                "evidence",
+                "capturedAt"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "requestId",
+        "status",
+        "scope",
+        "issues",
+        "result"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "__schema0": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "__schema1": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "UNSUPPORTED_VERSION",
+            "UNAVAILABLE",
+            "OUT_OF_SCOPE",
+            "REVISION_MISMATCH",
+            "READ_FAILED",
+            "SOURCE_MUTATED",
+            "POLICY_CHANGED",
+            "LIMIT_REACHED",
+            "BYTE_LIMIT",
+            "CANCELLED",
+            "DEADLINE",
+            "INDEX_MISSING",
+            "INDEX_INCOMPATIBLE",
+            "INDEX_UNAVAILABLE",
+            "INDEX_BUSY",
+            "STORAGE_FULL",
+            "PROVIDER_FAILED",
+            "EGRESS_DENIED",
+            "CAPABILITY_UNAVAILABLE"
+          ]
+        },
+        "stage": {
+          "type": "string",
+          "enum": [
+            "validation",
+            "workspace",
+            "read",
+            "match",
+            "index",
+            "retrieval",
+            "verify",
+            "provider",
+            "queue",
+            "serialization"
+          ]
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "path": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "nextAction": {
+          "type": "string",
+          "enum": [
+            "narrow-scope",
+            "retry-once",
+            "use-exact",
+            "request-index-create",
+            "request-rebuild",
+            "free-storage",
+            "fix-request",
+            "none"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "stage",
+        "retryable",
+        "message",
+        "nextAction"
+      ],
+      "additionalProperties": false
+    },
+    "__schema2": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^(?!\\/)(?!.*(?:^|\\/)\\.{1,2}(?:\\/|$))[^\\u0000\\\\\\r\\n/]+(?:\\/[^\\u0000\\\\\\r\\n/]+)*$"
+    },
+    "__schema3": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "__schema4": {
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema5"
+      }
+    },
+    "__schema5": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "__schema6": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "__schema7": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "#/$defs/__schema8"
+            },
+            "reason": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "value",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "required": [
+            "value",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema8": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "__schema9": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+    },
+    "__schema10": {
+      "type": "string",
+      "enum": [
+        "limit",
+        "cancelled",
+        "read-failure",
+        "deadline",
+        "policy-changed",
+        "source-mutated"
+      ]
+    },
+    "__schema11": {
+      "type": "object",
+      "properties": {
+        "evidence": {
+          "$ref": "#/$defs/__schema12"
+        },
+        "provenance": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "exact"
+            },
+            "queryKind": {
+              "type": "string",
+              "enum": [
+                "literal",
+                "regex"
+              ]
+            },
+            "matcherVersion": {
+              "$ref": "#/$defs/__schema0"
+            }
+          },
+          "required": [
+            "kind",
+            "queryKind",
+            "matcherVersion"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "evidence",
+        "provenance"
+      ],
+      "additionalProperties": false
+    },
+    "__schema12": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "path": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "fileSha256": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "range": {
+          "$ref": "#/$defs/__schema13"
+        },
+        "excerpt": {
+          "type": "object",
+          "properties": {
+            "range": {
+              "$ref": "#/$defs/__schema13"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "truncated": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "range",
+            "text",
+            "truncated"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "fileSha256",
+        "range",
+        "excerpt"
+      ],
+      "additionalProperties": false
+    },
+    "__schema13": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/__schema8"
+        },
+        "end": {
+          "$ref": "#/$defs/__schema8"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "additionalProperties": false
+    },
+    "__schema14": {
+      "type": "string",
+      "enum": [
+        "byte-limit",
+        "cancelled",
+        "deadline"
+      ]
+    },
+    "__schema15": {
+      "type": "object",
+      "properties": {
+        "evidence": {
+          "$ref": "#/$defs/__schema12"
+        },
+        "generationId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "rank": {
+          "maximum": 1000,
+          "$ref": "#/$defs/__schema6"
+        },
+        "liveVerification": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "not-requested"
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "matched"
+                },
+                "checkedAt": {
+                  "$ref": "#/$defs/__schema9"
+                },
+                "observedFileSha256": {
+                  "$ref": "#/$defs/__schema3"
+                }
+              },
+              "required": [
+                "kind",
+                "checkedAt",
+                "observedFileSha256"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "changed"
+                },
+                "checkedAt": {
+                  "$ref": "#/$defs/__schema9"
+                },
+                "observedFileSha256": {
+                  "$ref": "#/$defs/__schema3"
+                }
+              },
+              "required": [
+                "kind",
+                "checkedAt",
+                "observedFileSha256"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "unavailable"
+                },
+                "checkedAt": {
+                  "$ref": "#/$defs/__schema9"
+                },
+                "issue": {
+                  "$ref": "#/$defs/__schema1"
+                }
+              },
+              "required": [
+                "kind",
+                "checkedAt",
+                "issue"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "provenance": {
+          "minItems": 1,
+          "maxItems": 2,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema16"
+          }
+        }
+      },
+      "required": [
+        "evidence",
+        "generationId",
+        "rank",
+        "liveVerification",
+        "provenance"
+      ],
+      "additionalProperties": false
+    },
+    "__schema16": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "lexical",
+            "vector"
+          ]
+        },
+        "configFingerprint": {
+          "$ref": "#/$defs/__schema3"
+        }
+      },
+      "required": [
+        "kind",
+        "configFingerprint"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$id": "urn:jev-grep:v1:response",
+  "$comment": "Structural schema only. Enforce cross-field, UTF-8 byte, source, scope and authorization invariants in the runtime boundary. See docs/CONTRACTS.md."
+}

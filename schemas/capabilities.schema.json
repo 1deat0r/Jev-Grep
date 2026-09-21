@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "number",
+      "const": 1
+    },
+    "supportedVersions": {
+      "minItems": 1,
+      "maxItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "operations": {
+      "maxItems": 4,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema1"
+      }
+    },
+    "indexState": {
+      "type": "string",
+      "enum": [
+        "missing",
+        "ready",
+        "incompatible",
+        "unavailable"
+      ]
+    },
+    "migration": {
+      "type": "string",
+      "const": "unavailable"
+    },
+    "remoteProviders": {
+      "type": "string",
+      "const": "disabled"
+    },
+    "regexDialect": {
+      "type": "string",
+      "const": "ripgrep-default-line-oriented"
+    },
+    "matcherVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    }
+  },
+  "required": [
+    "version",
+    "supportedVersions",
+    "operations",
+    "indexState",
+    "migration",
+    "remoteProviders",
+    "regexDialect",
+    "matcherVersion"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "number",
+      "const": 1
+    },
+    "__schema1": {
+      "type": "string",
+      "enum": [
+        "exact",
+        "discover",
+        "read-verified",
+        "read-fresh"
+      ]
+    }
+  },
+  "$id": "urn:jev-grep:v1:capabilities",
+  "$comment": "Structural schema only. Enforce cross-field, UTF-8 byte, source, scope and authorization invariants in the runtime boundary. See docs/CONTRACTS.md."
+}

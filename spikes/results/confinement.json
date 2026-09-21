@@ -1,0 +1,14 @@
+{
+  "kind": "feasibility-not-release-acceptance",
+  "system": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+  "python": "3.14.4",
+  "tests": 10,
+  "failures": 0,
+  "errors": 0,
+  "elapsedMs": 10.279,
+  "limitations": [
+    "Python prototype; production helper unimplemented",
+    "Cannot bound kernel I/O stalls with userspace deadline checks alone",
+    "Mutation detection is observational, not an atomic snapshot"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "kind": "synthetic-feasibility-not-release-acceptance",
+  "runAt": "2026-09-21T07:12:19.651Z",
+  "files": 1000,
+  "bytes": 5011000,
+  "lines": 2000,
+  "hashes": 1000,
+  "fixtureSha256": "caab4e63aaa957c139063b368b0dae68ea4fcc2ac02c6b6cd92b63a0ef2e5249",
+  "environment": {
+    "node": "v26.8.1",
+    "kernel": "7.0.0-31-generic",
+    "cpu": "AMD Ryzen 7 5800X 8-Core Processor",
+    "cpus": 16,
+    "matcher": "ripgrep 15.2.0 (rev e89fff89ac)"
+  },
+  "perFileHashAndProcessMs": 2258.954,
+  "immutableStagingMs": 65.193,
+  "batchedMatchMs": 9.304,
+  "stagedTotalMs": 74.498,
+  "limitations": [
+    "One run, no p95 claim",
+    "Source bytes preallocated; excludes real enumeration and confined reads",
+    "Temporary staged copies are a comparison, not the selected production adapter",
+    "Reference hardware differs from the specification; not an acceptance benchmark"
+  ]
+}

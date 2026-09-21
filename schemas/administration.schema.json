@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "number",
+          "const": 1
+        },
+        "requestId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "operation": {
+          "type": "string",
+          "const": "register"
+        },
+        "absoluteRoot": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^\\/"
+        }
+      },
+      "required": [
+        "version",
+        "requestId",
+        "operation",
+        "absoluteRoot"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "requestId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "scopePolicyId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "narrow": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "operation": {
+          "type": "string",
+          "const": "index-create"
+        },
+        "refreshMode": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "enabled"
+          ]
+        },
+        "configFingerprint": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "version",
+        "requestId",
+        "workspaceId",
+        "scopePolicyId",
+        "operation",
+        "refreshMode",
+        "configFingerprint"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "requestId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "scopePolicyId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "narrow": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "operation": {
+          "type": "string",
+          "const": "index-refresh"
+        }
+      },
+      "required": [
+        "version",
+        "requestId",
+        "workspaceId",
+        "scopePolicyId",
+        "operation"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "requestId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "scopePolicyId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "narrow": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "operation": {
+          "type": "string",
+          "const": "index-rebuild"
+        },
+        "configFingerprint": {
+          "$ref": "#/$defs/__schema5"
+        }
+      },
+      "required": [
+        "version",
+        "requestId",
+        "workspaceId",
+        "scopePolicyId",
+        "operation",
+        "configFingerprint"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "requestId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "scopePolicyId": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "narrow": {
+          "$ref": "#/$defs/__schema2"
+        },
+        "operation": {
+          "type": "string",
+          "const": "index-migrate"
+        },
+        "targetFormat": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "version",
+        "requestId",
+        "workspaceId",
+        "scopePolicyId",
+        "operation",
+        "targetFormat"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "__schema0": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "__schema1": {
+      "type": "number",
+      "const": 1
+    },
+    "__schema2": {
+      "type": "object",
+      "properties": {
+        "include": {
+          "$ref": "#/$defs/__schema3"
+        },
+        "exclude": {
+          "$ref": "#/$defs/__schema3"
+        }
+      },
+      "required": [
+        "include",
+        "exclude"
+      ],
+      "additionalProperties": false
+    },
+    "__schema3": {
+      "maxItems": 64,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema4"
+      }
+    },
+    "__schema4": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "__schema5": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "$id": "urn:jev-grep:v1:administration",
+  "$comment": "Structural schema only. Enforce cross-field, UTF-8 byte, source, scope and authorization invariants in the runtime boundary. See docs/CONTRACTS.md."
+}
