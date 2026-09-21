@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "deadlineMs": {
+      "default": 10000,
+      "maximum": 30000,
+      "$ref": "#/$defs/__schema0"
+    },
+    "responseBytes": {
+      "default": 65536,
+      "type": "integer",
+      "minimum": 2048,
+      "maximum": 1048576,
+      "$ref": "#/$defs/__schema0"
+    }
+  },
+  "required": [
+    "deadlineMs",
+    "responseBytes"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    }
+  },
+  "$id": "urn:jev-grep:v1:request-context",
+  "$comment": "Structural schema only. Enforce cross-field, UTF-8 byte, source, scope and authorization invariants in the runtime boundary. See docs/CONTRACTS.md."
+}

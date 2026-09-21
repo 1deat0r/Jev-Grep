@@ -57,7 +57,24 @@
               "$ref": "#/$defs/__schema4"
             },
             "exclude": {
-              "$ref": "#/$defs/__schema4"
+              "maxItems": 128,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema6"
+              }
+            },
+            "includeGroups": {
+              "maxItems": 2,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema4"
+              }
+            },
+            "effectivePolicyHash": {
+              "$ref": "#/$defs/__schema3"
+            },
+            "policySnapshotHash": {
+              "$ref": "#/$defs/__schema3"
             },
             "respectIgnore": {
               "type": "boolean"
@@ -75,28 +92,28 @@
             },
             "maxFileBytes": {
               "maximum": 16777216,
-              "$ref": "#/$defs/__schema6"
+              "$ref": "#/$defs/__schema7"
             },
             "counts": {
               "type": "object",
               "properties": {
                 "searched": {
-                  "$ref": "#/$defs/__schema7"
+                  "$ref": "#/$defs/__schema8"
                 },
                 "indexed": {
-                  "$ref": "#/$defs/__schema7"
+                  "$ref": "#/$defs/__schema8"
                 },
                 "excluded": {
-                  "$ref": "#/$defs/__schema7"
+                  "$ref": "#/$defs/__schema8"
                 },
                 "unsupported": {
-                  "$ref": "#/$defs/__schema7"
+                  "$ref": "#/$defs/__schema8"
                 },
                 "oversized": {
-                  "$ref": "#/$defs/__schema7"
+                  "$ref": "#/$defs/__schema8"
                 },
                 "failed": {
-                  "$ref": "#/$defs/__schema7"
+                  "$ref": "#/$defs/__schema8"
                 }
               },
               "required": [
@@ -149,10 +166,10 @@
                       "const": "live-read"
                     },
                     "startedAt": {
-                      "$ref": "#/$defs/__schema9"
+                      "$ref": "#/$defs/__schema10"
                     },
                     "endedAt": {
-                      "$ref": "#/$defs/__schema9"
+                      "$ref": "#/$defs/__schema10"
                     }
                   },
                   "required": [
@@ -189,7 +206,7 @@
                           "maxItems": 6,
                           "type": "array",
                           "items": {
-                            "$ref": "#/$defs/__schema10"
+                            "$ref": "#/$defs/__schema11"
                           }
                         }
                       },
@@ -205,7 +222,7 @@
                   "maxItems": 1000,
                   "type": "array",
                   "items": {
-                    "$ref": "#/$defs/__schema11"
+                    "$ref": "#/$defs/__schema12"
                   }
                 }
               },
@@ -238,13 +255,13 @@
                       "$ref": "#/$defs/__schema3"
                     },
                     "publishedAt": {
-                      "$ref": "#/$defs/__schema9"
+                      "$ref": "#/$defs/__schema10"
                     },
                     "scanStartedAt": {
-                      "$ref": "#/$defs/__schema9"
+                      "$ref": "#/$defs/__schema10"
                     },
                     "scanEndedAt": {
-                      "$ref": "#/$defs/__schema9"
+                      "$ref": "#/$defs/__schema10"
                     },
                     "coverage": {
                       "type": "string",
@@ -254,13 +271,13 @@
                       ]
                     },
                     "failedFiles": {
-                      "$ref": "#/$defs/__schema8"
-                    },
-                    "observedAt": {
                       "$ref": "#/$defs/__schema9"
                     },
+                    "observedAt": {
+                      "$ref": "#/$defs/__schema10"
+                    },
                     "generationAgeMs": {
-                      "$ref": "#/$defs/__schema8"
+                      "$ref": "#/$defs/__schema9"
                     },
                     "clockSkew": {
                       "type": "boolean"
@@ -291,7 +308,7 @@
                               "$ref": "#/$defs/__schema0"
                             },
                             "completedAt": {
-                              "$ref": "#/$defs/__schema9"
+                              "$ref": "#/$defs/__schema10"
                             }
                           },
                           "required": [
@@ -312,7 +329,7 @@
                               "$ref": "#/$defs/__schema0"
                             },
                             "completedAt": {
-                              "$ref": "#/$defs/__schema9"
+                              "$ref": "#/$defs/__schema10"
                             },
                             "issue": {
                               "$ref": "#/$defs/__schema1"
@@ -354,7 +371,7 @@
                     },
                     "requestedLimit": {
                       "maximum": 1000,
-                      "$ref": "#/$defs/__schema6"
+                      "$ref": "#/$defs/__schema7"
                     },
                     "limitReached": {
                       "type": "boolean"
@@ -398,7 +415,7 @@
                           "maxItems": 3,
                           "type": "array",
                           "items": {
-                            "$ref": "#/$defs/__schema14"
+                            "$ref": "#/$defs/__schema15"
                           }
                         }
                       },
@@ -414,7 +431,7 @@
                   "maxItems": 1000,
                   "type": "array",
                   "items": {
-                    "$ref": "#/$defs/__schema15"
+                    "$ref": "#/$defs/__schema16"
                   }
                 }
               },
@@ -438,10 +455,10 @@
                   ]
                 },
                 "evidence": {
-                  "$ref": "#/$defs/__schema12"
+                  "$ref": "#/$defs/__schema13"
                 },
                 "capturedAt": {
-                  "$ref": "#/$defs/__schema9"
+                  "$ref": "#/$defs/__schema10"
                 }
               },
               "required": [
@@ -572,17 +589,22 @@
       "maxLength": 1024
     },
     "__schema6": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "__schema7": {
       "type": "integer",
       "minimum": 1,
       "maximum": 9007199254740991
     },
-    "__schema7": {
+    "__schema8": {
       "anyOf": [
         {
           "type": "object",
           "properties": {
             "value": {
-              "$ref": "#/$defs/__schema8"
+              "$ref": "#/$defs/__schema9"
             },
             "reason": {
               "type": "null"
@@ -614,17 +636,17 @@
         }
       ]
     },
-    "__schema8": {
+    "__schema9": {
       "type": "integer",
       "minimum": 0,
       "maximum": 9007199254740991
     },
-    "__schema9": {
+    "__schema10": {
       "type": "string",
       "format": "date-time",
       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
     },
-    "__schema10": {
+    "__schema11": {
       "type": "string",
       "enum": [
         "limit",
@@ -635,11 +657,11 @@
         "source-mutated"
       ]
     },
-    "__schema11": {
+    "__schema12": {
       "type": "object",
       "properties": {
         "evidence": {
-          "$ref": "#/$defs/__schema12"
+          "$ref": "#/$defs/__schema13"
         },
         "provenance": {
           "type": "object",
@@ -673,7 +695,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema12": {
+    "__schema13": {
       "type": "object",
       "properties": {
         "id": {
@@ -686,13 +708,13 @@
           "$ref": "#/$defs/__schema3"
         },
         "range": {
-          "$ref": "#/$defs/__schema13"
+          "$ref": "#/$defs/__schema14"
         },
         "excerpt": {
           "type": "object",
           "properties": {
             "range": {
-              "$ref": "#/$defs/__schema13"
+              "$ref": "#/$defs/__schema14"
             },
             "text": {
               "type": "string",
@@ -719,14 +741,14 @@
       ],
       "additionalProperties": false
     },
-    "__schema13": {
+    "__schema14": {
       "type": "object",
       "properties": {
         "start": {
-          "$ref": "#/$defs/__schema8"
+          "$ref": "#/$defs/__schema9"
         },
         "end": {
-          "$ref": "#/$defs/__schema8"
+          "$ref": "#/$defs/__schema9"
         }
       },
       "required": [
@@ -735,7 +757,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema14": {
+    "__schema15": {
       "type": "string",
       "enum": [
         "byte-limit",
@@ -743,18 +765,18 @@
         "deadline"
       ]
     },
-    "__schema15": {
+    "__schema16": {
       "type": "object",
       "properties": {
         "evidence": {
-          "$ref": "#/$defs/__schema12"
+          "$ref": "#/$defs/__schema13"
         },
         "generationId": {
           "$ref": "#/$defs/__schema0"
         },
         "rank": {
           "maximum": 1000,
-          "$ref": "#/$defs/__schema6"
+          "$ref": "#/$defs/__schema7"
         },
         "liveVerification": {
           "oneOf": [
@@ -779,7 +801,7 @@
                   "const": "matched"
                 },
                 "checkedAt": {
-                  "$ref": "#/$defs/__schema9"
+                  "$ref": "#/$defs/__schema10"
                 },
                 "observedFileSha256": {
                   "$ref": "#/$defs/__schema3"
@@ -800,7 +822,7 @@
                   "const": "changed"
                 },
                 "checkedAt": {
-                  "$ref": "#/$defs/__schema9"
+                  "$ref": "#/$defs/__schema10"
                 },
                 "observedFileSha256": {
                   "$ref": "#/$defs/__schema3"
@@ -821,7 +843,7 @@
                   "const": "unavailable"
                 },
                 "checkedAt": {
-                  "$ref": "#/$defs/__schema9"
+                  "$ref": "#/$defs/__schema10"
                 },
                 "issue": {
                   "$ref": "#/$defs/__schema1"
@@ -841,7 +863,7 @@
           "maxItems": 2,
           "type": "array",
           "items": {
-            "$ref": "#/$defs/__schema16"
+            "$ref": "#/$defs/__schema17"
           }
         }
       },
@@ -854,7 +876,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema16": {
+    "__schema17": {
       "type": "object",
       "properties": {
         "kind": {

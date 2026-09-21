@@ -9,10 +9,11 @@ Date: 2026-09-21. This register tracks implementation decisions without altering
 | D003 | T00.1 | SQLite binding and MCP runtime package | Open; not installed prematurely | Before storage/MCP code; API inspection required |
 | D004 | T00.2 | Independent contract core; no upstream code copied; upstream reuse screening in 0001 | Selected for this increment; deeper reuse audit deferred | Before adopting an upstream subsystem |
 | D005 | T00.3 | Linux openat2/O_PATH regular-file prototype passes adversarial fixtures; production helper/lifecycle still required | Feasible prototype, not frozen production adapter | Before M2 workspace capture |
-| D006 | T00.4 | Reject process-per-file as the intended production architecture; staged copies show batching benefit but staging cost remains | Preliminary; persistent/batched helper comparison pending | Before M2 matcher |
+| D006 | T00.4 | Persistent Rust worker selected for the Linux development core; 200-query synthetic measurement retained in ADR 0002; scoped service performance not yet measured | Selected for core, release qualification pending | Before M2 matcher |
 | D007 | T01.1–4 | Zod structural schemas plus separate source/cross-field checks; field decisions in CONTRACTS.md | Partial M1 implemented | Before adapter integration |
 | D008 | T03.1 | IPC ownership, common deadlines, capability serving | Open | Before M3 integration |
 | D009 | T04.1–3 | Generation sink, payload ownership and store activation protocol | Open | Before M4 publication |
+| D011 | T02.1 | Immutable registered policy, workspace-local ignore dialect, pinned root identity and explicit narrowing; ADR 0003 | Implemented core boundary | M2 scoped search/reads |
 | D010 | E01–E03 | Synthetic development feasibility reports only; no sealed corpus or agent-quality claims | Open | Before ranked acceptance |
 
 The current machine has a Ryzen 7 5800X, 16 logical CPUs, Linux 7.0.0-31-generic, and an ext4 project volume. It is not asserted to be the specification's calibrated reference environment. Time-dependent package metadata was checked against the registry; implementation API shapes were checked against the installed locked versions.

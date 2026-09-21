@@ -1,10 +1,10 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { z } from 'zod';
-import { AdminRequestSchema, CapabilitiesSchema, EvidenceSchema, RequestSchema, ResponseSchema } from '../src/contracts/schemas.js';
+import { AdminRequestSchema, CapabilitiesSchema, EvidenceSchema, RequestContextSchema, RequestSchema, ResponseSchema } from '../src/contracts/schemas.js';
 
 const mode = process.argv[2];
 if (mode !== '--write' && mode !== '--check') throw new Error('Use --write or --check');
-const schemas = { request: RequestSchema, response: ResponseSchema, evidence: EvidenceSchema, administration: AdminRequestSchema, capabilities: CapabilitiesSchema };
+const schemas = { 'request-context': RequestContextSchema, request: RequestSchema, response: ResponseSchema, evidence: EvidenceSchema, administration: AdminRequestSchema, capabilities: CapabilitiesSchema };
 if (mode === '--write') await mkdir('schemas', { recursive: true });
 for (const [name, schema] of Object.entries(schemas)) {
   const output = JSON.stringify({

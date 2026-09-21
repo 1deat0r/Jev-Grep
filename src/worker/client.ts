@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
-import { isAbsolute, resolve } from 'node:path';
+import { isAbsolute } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { FRAME_CAP, validateWorkerResponse, WorkerReadySchema, WorkerRequestSchema } from './protocol.js';
 import type { WorkerInput, WorkerRequest, WorkerResponse } from './protocol.js';
@@ -25,16 +26,28 @@ export class NativeWorker {
   private input = Buffer.alloc(0);
   private sequence = 0;
   private rootIdentity: string | undefined;
+  private opening: { resolve: () => void; reject: (error: WorkerError) => void; timer: NodeJS.Timeout } | undefined;
   readonly binary: string;
-  constructor(readonly root: string, binary = resolve('native/worker/target/release/jev-worker-prototype')) {
+  constructor(readonly root: string, binary = fileURLToPath(new URL('../../../native/worker/target/release/jev-worker-prototype', import.meta.url)), expectedRootIdentity?: string) {
     if (!isAbsolute(root) || root.includes('\0')) throw new WorkerError('INVALID_REQUEST');
-    this.binary = binary;
+    this.binary = binary; this.rootIdentity = expectedRootIdentity;
+  }
+  /** Eagerly pin the root at registration, without enumerating or reading source files. */
+  open(): Promise<void> {
+    if (this.disposed) return Promise.reject(new WorkerError('WORKER_CLOSED'));
+    if (this.ready) return Promise.resolve();
+    if (this.opening || this.pending) return Promise.reject(new WorkerError('WORKER_BUSY'));
+    if (this.retiring) return Promise.reject(new WorkerError('WORKER_RESTARTING'));
+    return new Promise((resolve, reject) => {
+      this.opening = { resolve, reject, timer: setTimeout(() => this.fail('DEADLINE'), 10_000) };
+      this.start();
+    });
   }
   get pid(): number | undefined { return this.child?.pid; }
 
   search(input: WorkerInput, options: { signal?: AbortSignal } = {}): Promise<WorkerResponse> {
     if (this.disposed) return Promise.reject(new WorkerError('WORKER_CLOSED'));
-    if (this.pending) return Promise.reject(new WorkerError('WORKER_BUSY'));
+    if (this.pending || this.opening) return Promise.reject(new WorkerError('WORKER_BUSY'));
     if (this.retiring) return Promise.reject(new WorkerError('WORKER_RESTARTING'));
     if (options.signal?.aborted) return Promise.reject(new WorkerError('CANCELLED'));
     const parsed = WorkerRequestSchema.omit({ v: true, id: true }).safeParse({
@@ -84,7 +97,10 @@ export class NativeWorker {
             if (hello.pid !== child.pid) throw new Error('pid mismatch');
             const identity = `${hello.rootDev}:${hello.rootIno}`;
             if (this.rootIdentity !== undefined && this.rootIdentity !== identity) { this.fail('ROOT_CHANGED'); return; }
-            this.rootIdentity = identity; this.ready = true; this.send();
+            this.rootIdentity = identity; this.ready = true;
+            const opening = this.opening; this.opening = undefined;
+            if (opening) { clearTimeout(opening.timer); opening.resolve(); }
+            this.send();
           } else {
             const pending = this.pending;
             if (!pending) throw new Error('unsolicited frame');
@@ -115,6 +131,8 @@ export class NativeWorker {
       child.once('close', () => { this.retiring = false; });
       child.kill('SIGKILL');
     }
+    const opening = this.opening; this.opening = undefined;
+    if (opening) { clearTimeout(opening.timer); opening.reject(new WorkerError(code)); }
     const pending = this.pending; this.pending = undefined;
     if (pending) { clearTimeout(pending.timer); pending.cleanup(); pending.reject(new WorkerError(code)); }
   }

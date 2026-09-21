@@ -59,9 +59,15 @@ const reportedCount = z.union([
   z.strictObject({ value: count, reason: z.null() }),
   z.strictObject({ value: z.null(), reason: z.string().min(1).max(256) }),
 ]);
+export const RequestContextSchema = z.strictObject({
+  deadlineMs: positive.max(LIMITS.deadlineMs).default(10_000),
+  responseBytes: positive.min(2048).max(LIMITS.responseBytes).default(65_536),
+});
 export const EffectiveScopeSchema = z.strictObject({
   workspaceId: id, policyId: id, policyHash: DigestSchema,
-  include: patterns, exclude: patterns,
+  include: patterns, exclude: z.array(z.string().min(1).max(LIMITS.patternBytes)).max(128),
+  includeGroups: z.array(patterns).max(2).optional(),
+  effectivePolicyHash: DigestSchema.optional(), policySnapshotHash: DigestSchema.optional(),
   respectIgnore: z.boolean(), hidden: z.boolean(), symlinks: z.literal('reject'),
   encoding: z.literal('utf-8'), maxFileBytes: positive.max(LIMITS.fileBytes),
   counts: z.strictObject({
